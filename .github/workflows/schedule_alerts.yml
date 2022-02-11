@@ -34,4 +34,4 @@ jobs:
       - name: Execute Python script # Run the app.py
 #         run: |
 #           SCRAPING_HUB_KEY=${{secrets.SCRAPING_HUB_KEY }}  python handler.py
-        run: python handler.py
+        run: python main.py
