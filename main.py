@@ -3,11 +3,10 @@ from send_alerts import (
     get_relevant_jobs,
     save_sent_alerts,
     dynamodb_web_service,
-    local_db,
-    is_prod,
+    # local_db,
+    # is_prod,
 )
 from email_template import html_email
-from typing import Any
 
 
 def main():
