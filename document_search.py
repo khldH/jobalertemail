@@ -26,7 +26,7 @@ class Document(BaseModel):
 class DocumentSearch(TfidfVectorizer):
     def __init__(self, documents: List):
         self.documents = documents
-        super(DocumentSearch, self).__init__(stop_words='english')
+        super(DocumentSearch, self).__init__(stop_words="english")
 
     def search(self, query):
         """
@@ -45,6 +45,7 @@ class DocumentSearch(TfidfVectorizer):
                 similarity = cosine_similarity(vec_query, vec_document)
                 if similarity >= 0.7:
                     job = {
+                        "id": document.id,
                         "title": document.title,
                         "url": document.url,
                         "source": document.source,
@@ -54,15 +55,15 @@ class DocumentSearch(TfidfVectorizer):
                     }
                     if document.source == "Somali jobs":
                         job["days_since_posted"] = (
-                                datetime.now().date()
-                                - datetime.strptime(document.posted_date, "%d %b %Y").date()
+                            datetime.now().date()
+                            - datetime.strptime(document.posted_date, "%d %b %Y").date()
                         ).days
                     else:
                         job["days_since_posted"] = (
-                                datetime.now().date()
-                                - datetime.fromisoformat(document.posted_date).date()
+                            datetime.now().date()
+                            - datetime.fromisoformat(document.posted_date).date()
                         ).days
-                    if job['days_since_posted'] <= 3:
+                    if job["days_since_posted"] <= 3:
                         results.append(job)
             return sorted(
                 results, key=lambda item: item["days_since_posted"], reverse=False
