@@ -54,36 +54,38 @@ def send_daily_job_alerts(db_con, user, email_template):
     user_relevant_jobs = get_relevant_jobs(db_con, user)
     if len(user_relevant_jobs) > 0:
         rows = ""
+        count_new_jobs = 0
         for item in user_relevant_jobs:
             if item["url"] not in sent_job_urls:
+                count_new_jobs += 1
                 rows = (
-                    rows + "<tr><td>"
-                    "<a href=" + item["url"] + ">" + str(item["title"]) + "</a>"
-                    "</td></tr>"
+                        rows + "<tr><td>"
+                               "<a href=" + item["url"] + ">" + str(item["title"]) + "</a>"
+                                                                                     "</td></tr>"
                 )
                 rows = rows + "<tr><td>" + str(item["organization"]) + "</td></tr>"
                 rows = (
-                    rows
-                    + "<tr><td>"
-                    + str(item["days_since_posted"])
-                    + " "
-                    + "days ago"
-                    + "</td></tr>"
+                        rows
+                        + "<tr><td>"
+                        + str(item["days_since_posted"])
+                        + " "
+                        + "days ago"
+                        + "</td></tr>"
                 )
                 rows = rows + "<br>"
         if rows:
             try:
                 content = email_template.format(
                     jobs=rows,
-                    title=len(user_relevant_jobs),
+                    title=count_new_jobs,
                     saved_alert=user["job_description"],
                 )
                 email_title = (
-                    str(len(user_relevant_jobs))
-                    + " "
-                    + "new"
-                    + " "
-                    + user["job_description"]
+                        str(count_new_jobs)
+                        + " "
+                        + "new"
+                        + " "
+                        + user["job_description"]
                 )
                 email = Email(sender_email, sender_password)
                 email.send_message(content, email_title, user["email"])
@@ -103,7 +105,8 @@ def save_sent_alerts(db_con, user, alerts):
                 Item={
                     "user_id": user["id"],
                     "job_id": item["id"],
-                    "job_url": item["url"],
+                    "job_url": item['url'],
+                    "user_id_job_url": user["id"] + item["url"],
                     "created_at": datetime.utcnow().isoformat(),
                 }
             )
