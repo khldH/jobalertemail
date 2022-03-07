@@ -39,6 +39,7 @@ def get_relevant_jobs(db_con, user):
             query = re.sub("[^A-Za-z0-9]+", " ", user["job_description"])
             if len(query) > 1:
                 relevant_jobs = document_search.search(query)
+                # print(relevant_jobs)
                 return relevant_jobs
         except Exception as e:
             print(e)
