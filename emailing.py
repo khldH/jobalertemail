@@ -12,7 +12,7 @@ class Email:
     def send_message(self, content: str, subject: str, mail_to: str):
         message = MIMEText(content, "html", "utf-8")
         message["Subject"] = subject
-        message["From"] = self.user
+        message["From"] = formataddr(('diractly', self.user))
         message["To"] = mail_to
         try:
             mail_server = SMTP(self.server, self.port)
