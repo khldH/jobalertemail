@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from typing import Optional, List
-from pydantic import BaseModel
 from datetime import datetime
-from sklearn.metrics.pairwise import cosine_similarity
+from typing import List, Optional
+
+from pydantic import BaseModel
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 class Document(BaseModel):

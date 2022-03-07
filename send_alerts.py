@@ -1,11 +1,13 @@
 import os
-from document_search import Document, DocumentSearch
 import re
-from dotenv import load_dotenv
+from datetime import datetime
+
 import boto3
 from boto3.dynamodb.conditions import Attr
+from dotenv import load_dotenv
+
+from document_search import Document, DocumentSearch
 from emailing import Email
-from datetime import datetime
 
 load_dotenv()
 
@@ -19,6 +21,7 @@ dynamodb_web_service = boto3.resource(
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
 )
+
 
 # local_db = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
 
@@ -58,20 +61,22 @@ def send_daily_job_alerts(db_con, user, email_template):
         for item in user_relevant_jobs:
             if item["url"] not in sent_job_urls:
                 count_new_jobs += 1
+                days_since_posted = ""
+                if item["days_since_posted"] == 0:
+                    days_since_posted += "today"
+                elif item["days_since_posted"] == 1:
+                    days_since_posted += "yesterday"
+                else:
+                    days_since_posted += (
+                        str(item["days_since_posted"]) + " " + "days ago"
+                    )
                 rows = (
-                        rows + "<tr><td>"
-                               "<a href=" + item["url"] + ">" + str(item["title"]) + "</a>"
-                                                                                     "</td></tr>"
+                    rows + "<tr><td>"
+                    "<a href=" + item["url"] + ">" + str(item["title"]) + "</a>"
+                    "</td></tr>"
                 )
                 rows = rows + "<tr><td>" + str(item["organization"]) + "</td></tr>"
-                rows = (
-                        rows
-                        + "<tr><td>"
-                        + str(item["days_since_posted"])
-                        + " "
-                        + "days ago"
-                        + "</td></tr>"
-                )
+                rows = rows + "<tr><td>" + days_since_posted + "</td></tr>"
                 rows = rows + "<br>"
         if rows:
             try:
@@ -81,11 +86,7 @@ def send_daily_job_alerts(db_con, user, email_template):
                     saved_alert=user["job_description"],
                 )
                 email_title = (
-                        str(count_new_jobs)
-                        + " "
-                        + "new"
-                        + " "
-                        + user["job_description"]
+                    str(count_new_jobs) + " " + "new" + " " + user["job_description"]
                 )
                 email = Email(sender_email, sender_password)
                 email.send_message(content, email_title, user["email"])
@@ -105,7 +106,7 @@ def save_sent_alerts(db_con, user, alerts):
                 Item={
                     "user_id": user["id"],
                     "job_id": item["id"],
-                    "job_url": item['url'],
+                    "job_url": item["url"],
                     "user_id_job_url": user["id"] + item["url"],
                     "created_at": datetime.utcnow().isoformat(),
                 }

@@ -1,12 +1,7 @@
-from send_alerts import (
-    send_daily_job_alerts,
-    get_relevant_jobs,
-    save_sent_alerts,
-    dynamodb_web_service,
-    # local_db,
-    # is_prod,
-)
 from email_template import html_email
+from send_alerts import (dynamodb_web_service,  # local_db,; is_prod,
+                         get_relevant_jobs, save_sent_alerts,
+                         send_daily_job_alerts)
 
 
 def main():
