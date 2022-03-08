@@ -10,6 +10,7 @@ def main():
     for user in aws_users:
         try:
             relevant_jobs_found = get_relevant_jobs(db, user)
+            # print(relevant_jobs_found)
             send_daily_job_alerts(db, user, html_email)
             save_sent_alerts(db, user, relevant_jobs_found)
         except Exception as e:
