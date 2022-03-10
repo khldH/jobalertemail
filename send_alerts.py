@@ -5,6 +5,7 @@ from datetime import datetime
 import boto3
 from boto3.dynamodb.conditions import Attr
 from dotenv import load_dotenv
+from itsdangerous import BadData, URLSafeSerializer
 
 from document_search import Document, DocumentSearch
 from emailing import Email
@@ -14,6 +15,7 @@ load_dotenv()
 sender_email = os.getenv("EMAIL_SENDER")
 sender_password = os.getenv("EMAIL_SENDER_PASSWORD")
 is_prod = os.getenv("is_prod")
+secret_key = os.getenv("SECRET_KEY")
 
 dynamodb_web_service = boto3.resource(
     "dynamodb",
@@ -22,8 +24,7 @@ dynamodb_web_service = boto3.resource(
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
 )
 
-
-# local_db = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
+local_db = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
 
 
 def get_relevant_jobs(db_con, user):
@@ -81,8 +82,14 @@ def send_daily_job_alerts(db_con, user, email_template):
                 rows = rows + "<br>"
         if rows:
             try:
+                s = URLSafeSerializer(secret_key, salt="unsubscribe")
+                token = s.dumps(user["email"])
+                url = "http://localhost:8001/unsubscribe/{}".format(token)
+                # rows = rows + "<tr><td>" + url + "</td></tr>"
+
                 content = email_template.format(
                     jobs=rows,
+                    unsubscribe_url=url,
                     title=count_new_jobs,
                     saved_alert=user["job_description"],
                 )

@@ -22,7 +22,9 @@ class Document(BaseModel):
 
     @property
     def full_text(self):
-        return " ".join([self.title, self.category, self.type, self.location, self.organization])
+        return " ".join(
+            [self.title, self.category, self.type, self.location, self.organization]
+        )
 
 
 class DocumentSearch(TfidfVectorizer):
@@ -55,19 +57,21 @@ class DocumentSearch(TfidfVectorizer):
                         "organization": document.organization,
                         "posted_date": document.posted_date,
                         "type": document.type,
-                        "category": document.category
+                        "category": document.category,
                     }
                     if document.source == "Somali jobs":
                         job["days_since_posted"] = (
-                                datetime.now().date()
-                                - datetime.strptime(document.posted_date, "%d %b %Y").date()
+                            datetime.now().date()
+                            - datetime.strptime(document.posted_date, "%d %b %Y").date()
                         ).days
                     else:
                         job["days_since_posted"] = (
-                                datetime.now().date()
-                                - datetime.fromisoformat(document.posted_date).date()
+                            datetime.now().date()
+                            - datetime.fromisoformat(document.posted_date).date()
                         ).days
-                    if job["days_since_posted"] <= 3 and job["category"].strip() not in ["Tender/Bid/RFQ/RFP", "Course",""]:
+                    if job["days_since_posted"] <= 3 and job[
+                        "category"
+                    ].strip() not in ["Tender/Bid/RFQ/RFP", "Course", ""]:
                         results.append(job)
             return sorted(
                 results, key=lambda item: item["days_since_posted"], reverse=False
