@@ -24,7 +24,7 @@ dynamodb_web_service = boto3.resource(
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
 )
 
-local_db = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
+# local_db = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
 
 
 def get_relevant_jobs(db_con, user):
