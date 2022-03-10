@@ -4,7 +4,7 @@ from send_alerts import (dynamodb_web_service, get_relevant_jobs, local_db,
 
 
 def main():
-    db = local_db
+    db = dynamodb_web_service
     aws_db_table_users = db.Table("users")
     aws_users = aws_db_table_users.scan()["Items"]
     for user in aws_users:
