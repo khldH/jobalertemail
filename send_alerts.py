@@ -84,7 +84,7 @@ def send_daily_job_alerts(db_con, user, email_template):
             try:
                 s = URLSafeSerializer(secret_key, salt="unsubscribe")
                 token = s.dumps(user["email"])
-                url = "http://localhost:8001/unsubscribe/{}".format(token)
+                url = "http://www.diractly.com/unsubscribe/{}".format(token)
                 # rows = rows + "<tr><td>" + url + "</td></tr>"
 
                 content = email_template.format(
