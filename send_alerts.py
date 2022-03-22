@@ -74,7 +74,11 @@ def send_daily_job_alerts(db_con, user, email_template):
                     )
                 rows = (
                     rows + "<tr><td>"
-                    "<a href=" + item["url"] + ">" + str(item["title"]) + "</a>"
+                    "<a style={text-decoration:none} href="
+                    + item["url"]
+                    + ">"
+                    + str(item["title"])
+                    + "</a>"
                     "</td></tr>"
                 )
                 rows = rows + "<tr><td>" + str(item["organization"]) + "</td></tr>"
@@ -83,13 +87,18 @@ def send_daily_job_alerts(db_con, user, email_template):
         if rows:
             try:
                 s = URLSafeSerializer(secret_key, salt="unsubscribe")
-                token = s.dumps(user["email"])
-                url = "http://www.diractly.com/unsubscribe/{}".format(token)
-                # rows = rows + "<tr><td>" + url + "</td></tr>"
+                e = URLSafeSerializer(secret_key, salt="edit")
+                unsubscribe_token = s.dumps(user["email"])
+                edit_token = e.dumps(user["email"])
+                unsubscribe_url = "http://www.diractly.com/unsubscribe/{}".format(
+                    unsubscribe_token
+                )
+                edit_url = "http://www.diractly.com/edit/{}".format(edit_token)
 
                 content = email_template.format(
                     jobs=rows,
-                    unsubscribe_url=url,
+                    unsubscribe_url=unsubscribe_url,
+                    edit_url=edit_url,
                     title=count_new_jobs,
                     saved_alert=user["job_description"],
                 )

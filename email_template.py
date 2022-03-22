@@ -23,7 +23,7 @@ html_email = """
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                     <tr>
                       <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">
-                        <h3 style="font-family: sans-serif; font-size: 24px; font-weight: bold; margin: 0; margin-bottom: 15px; text-align:center">{title} new {saved_alert}</h3>
+                        <h3 style="font-family: sans-serif; font-size: 12px; font-weight: bold; margin: 0; margin-bottom: 15px; text-align:center">{title} new {saved_alert}</h3>
                         <p style="font-family: sans-serif; font-size: 12px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align:center">These job ads match your saved job alert </p>
                         <hr>
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; box-sizing: border-box; width: 100%;" width="100%">
@@ -31,7 +31,7 @@ html_email = """
                             <tr>
                               <td align="left" style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;" valign="top">
                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
-                                  <tbody>
+                                  <tbody style = "text-decoration: none">
                                     {jobs}
                                   </tbody>
                                 </table>
@@ -55,13 +55,18 @@ html_email = """
             <div class="footer" style="clear: both; margin-top: 10px; text-align: center; width: 100%;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                 <tr>
-                  <td class="content-block">
-                    <br><a href="{unsubscribe_url}">Unsubscribe</a>.
+                    <td class="content-block">
+                    <br><a href="{edit_url}" style="font-size: 14px; text-align: center; text-decoration: none;">Edit this job alert</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; color: #999999; font-size: 12px; text-align: center;" valign="top" align="center">
+                    <br><a href="{unsubscribe_url}" style="color: #999999; font-size: 12px; text-align: center; text-decoration: none;">Unsubscribe</a>
                   </td>
                 </tr>
                 <tr>
                   <td class="content-block powered-by" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; color: #999999; font-size: 12px; text-align: center;" valign="top" align="center">
-                    Powered by <a href="http://www.diractly.com" style="color: #999999; font-size: 12px; text-align: center; text-decoration: none;">diractly</a>.
+                    Powered by <a href="http://www.diractly.com" style="color: #999999; font-size: 12px; text-align: center; text-decoration: none;">diractly</a>
                   </td>
                 </tr>
               </table>
