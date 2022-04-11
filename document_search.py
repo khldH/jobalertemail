@@ -53,7 +53,7 @@ class DocumentSearch(TfidfVectorizer):
                         "title": document.title,
                         "url": document.url,
                         "source": document.source,
-                        "similarity_score": similarity[0],
+                        # "similarity_score": similarity[0],
                         "organization": document.organization,
                         "posted_date": document.posted_date,
                         "type": document.type,

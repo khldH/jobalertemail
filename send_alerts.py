@@ -4,27 +4,10 @@ from datetime import datetime
 
 import boto3
 from boto3.dynamodb.conditions import Attr
-from dotenv import load_dotenv
 from itsdangerous import BadData, URLSafeSerializer
 
 from document_search import Document, DocumentSearch
 from emailing import Email
-
-load_dotenv()
-
-sender_email = os.getenv("EMAIL_SENDER")
-sender_password = os.getenv("EMAIL_SENDER_PASSWORD")
-is_prod = os.getenv("is_prod")
-secret_key = os.getenv("SECRET_KEY")
-
-dynamodb_web_service = boto3.resource(
-    "dynamodb",
-    region_name=os.getenv("AWS_REGION_NAME"),
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-)
-
-# local_db = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
 
 
 def get_relevant_jobs(db_con, user):
@@ -33,21 +16,63 @@ def get_relevant_jobs(db_con, user):
     documents = []
     for job in jobs:
         documents.append(Document(**job))
-    if user["is_active"]:
+    if user["is_active"] and user["job_description"] is not None:
         try:
-            # print(user)
             document_search = DocumentSearch(documents)
             query = re.sub("[^A-Za-z0-9]+", " ", user["job_description"])
             if len(query) > 1:
                 relevant_jobs = document_search.search(query)
-                # print(relevant_jobs)
                 return relevant_jobs
         except Exception as e:
             print(e)
     return []
 
 
-def send_daily_job_alerts(db_con, user, email_template):
+def get_jobs_from_followed_orgs(db_con, user):
+    table = db_con.Table("jobs")
+    jobs = table.scan()["Items"]
+    jobs_posted_by_orgs_followed = []
+    if user["is_active"] and user.get("follows", None):
+        for org in user["follows"]:
+            for job in jobs:
+                if job["organization"] == org:
+                    _job = {
+                        "id": job["id"],
+                        "title": job["title"],
+                        "url": job["url"],
+                        "source": job["source"],
+                        "organization": job["organization"],
+                        "posted_date": job["posted_date"],
+                        "type": job["type"],
+                        "category": job["category"],
+                    }
+                    if _job["source"] == "Somali jobs":
+                        _job["days_since_posted"] = (
+                            datetime.now().date()
+                            - datetime.strptime(_job["posted_date"], "%d %b %Y").date()
+                        ).days
+                    else:
+                        _job["days_since_posted"] = (
+                            datetime.now().date()
+                            - datetime.fromisoformat(_job["posted_date"]).date()
+                        ).days
+                    if _job["days_since_posted"] <= 3 and _job[
+                        "category"
+                    ].strip() not in ["Tender/Bid/RFQ/RFP", "Course", ""]:
+                        jobs_posted_by_orgs_followed.append(_job)
+        return jobs_posted_by_orgs_followed
+    return []
+
+
+def send_daily_job_alerts(
+    db_con,
+    user,
+    matched_jobs,
+    email_template,
+    secret_key,
+    sender_email,
+    sender_password,
+):
     table_sent_job_alerts = db_con.Table("sent_job_alerts")
     alerts = table_sent_job_alerts.scan(
         FilterExpression=Attr("user_id").eq(user["id"])
@@ -56,13 +81,15 @@ def send_daily_job_alerts(db_con, user, email_template):
     if len(alerts):
         for alert in alerts:
             sent_job_urls.append(alert["job_url"])
-    user_relevant_jobs = get_relevant_jobs(db_con, user)
+    user_relevant_jobs = matched_jobs
     if len(user_relevant_jobs) > 0:
         rows = ""
         count_new_jobs = 0
+        first_job_title = ""
         for item in user_relevant_jobs:
             if item["url"] not in sent_job_urls:
                 count_new_jobs += 1
+                first_job_title = item["title"]
                 days_since_posted = ""
                 if item["days_since_posted"] == 0:
                     days_since_posted += "today"
@@ -93,17 +120,23 @@ def send_daily_job_alerts(db_con, user, email_template):
                 unsubscribe_url = "http://www.diractly.com/unsubscribe/{}".format(
                     unsubscribe_token
                 )
-                edit_url = "http://www.diractly.com/edit/{}".format(edit_token)
+                edit_url = "http://localhost:8001/edit/{}".format(edit_token)
 
                 content = email_template.format(
                     jobs=rows,
                     unsubscribe_url=unsubscribe_url,
                     edit_url=edit_url,
                     title=count_new_jobs,
-                    saved_alert=user["job_description"],
+                    # saved_alert=user["job_description"],
                 )
                 email_title = (
-                    str(count_new_jobs) + " " + "new" + " " + user["job_description"]
+                    first_job_title
+                    + " "
+                    + "and"
+                    + " "
+                    + str(count_new_jobs - 1)
+                    + " "
+                    + "other new job(s) have been found for you "
                 )
                 email = Email(sender_email, sender_password)
                 email.send_message(content, email_title, user["email"])
