@@ -120,7 +120,7 @@ def send_daily_job_alerts(
                 unsubscribe_url = "http://www.diractly.com/unsubscribe/{}".format(
                     unsubscribe_token
                 )
-                edit_url = "http://localhost:8001/edit/{}".format(edit_token)
+                edit_url = "http://www.diractly.com/edit/{}".format(edit_token)
 
                 content = email_template.format(
                     jobs=rows,
