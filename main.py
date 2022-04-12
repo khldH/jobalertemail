@@ -13,18 +13,18 @@ sender_email = os.getenv("EMAIL_SENDER")
 sender_password = os.getenv("EMAIL_SENDER_PASSWORD")
 secret_key = os.getenv("SECRET_KEY")
 
-# dynamodb_web_service = boto3.resource(
-#     "dynamodb",
-#     region_name=os.getenv("AWS_REGION_NAME"),
-#     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-#     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-# )
+dynamodb_web_service = boto3.resource(
+    "dynamodb",
+    region_name=os.getenv("AWS_REGION_NAME"),
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+)
 
-local_db = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
+# local_db = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
 
 
 def main():
-    db = local_db
+    db = dynamodb_web_service
     _users = db.Table("users")
     users = _users.scan()["Items"]
 
