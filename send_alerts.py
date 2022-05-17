@@ -1,6 +1,7 @@
 import os
 import re
 from datetime import datetime
+from dateutil import parser
 
 import boto3
 from boto3.dynamodb.conditions import Attr
@@ -47,10 +48,16 @@ def get_jobs_from_followed_orgs(db_con, user):
                         "category": job["category"],
                     }
                     if _job["source"] == "Somali jobs":
-                        _job["days_since_posted"] = (
-                            datetime.now().date()
-                            - datetime.strptime(_job["posted_date"], "%d %b %Y").date()
-                        ).days
+                        if _job.posted_date == "Today":
+                            _job["days_since_posted"] = 0
+                        elif _job.posted_date == "Yesterday":
+                            _job["days_since_posted"] = 1
+                        else:
+                            _job["days_since_posted"] = (
+                                datetime.now().date()
+                                - parser.parse(_job.posted_date).date()
+                            ).days
+
                     else:
                         _job["days_since_posted"] = (
                             datetime.now().date()

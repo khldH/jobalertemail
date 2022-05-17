@@ -4,8 +4,12 @@ import boto3
 from dotenv import load_dotenv
 
 from email_template import html_email
-from send_alerts import (get_jobs_from_followed_orgs, get_relevant_jobs,
-                         save_sent_alerts, send_daily_job_alerts)
+from send_alerts import (
+    get_jobs_from_followed_orgs,
+    get_relevant_jobs,
+    save_sent_alerts,
+    send_daily_job_alerts,
+)
 
 load_dotenv()
 
