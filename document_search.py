@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from dateutil import parser
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -60,10 +61,16 @@ class DocumentSearch(TfidfVectorizer):
                         "category": document.category,
                     }
                     if document.source == "Somali jobs":
-                        job["days_since_posted"] = (
-                            datetime.now().date()
-                            - datetime.strptime(document.posted_date, "%d %b %Y").date()
-                        ).days
+                        if document.posted_date == "Today":
+                            job["days_since_posted"] = 0
+                        elif document.posted_date == "Yesterday":
+                            job["days_since_posted"] = 1
+                        else:
+                            job["days_since_posted"] = (
+                                datetime.now().date()
+                                - parser.parse(document.posted_date).date()
+                            ).days
+
                     else:
                         job["days_since_posted"] = (
                             datetime.now().date()
