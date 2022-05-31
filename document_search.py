@@ -48,7 +48,7 @@ class DocumentSearch(TfidfVectorizer):
                 doc = document.full_text
                 vec_document = self.transform([doc]).toarray()
                 similarity = cosine_similarity(vec_query, vec_document)
-                if similarity >= 0.7:
+                if similarity >= 0.80:
                     job = {
                         "id": document.id,
                         "title": document.title,

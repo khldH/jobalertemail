@@ -24,17 +24,18 @@ dynamodb_web_service = boto3.resource(
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
 )
 
-# local_db = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
+# local_db = boto3.resource(
+#     "dynamodb", endpoint_url="http://localhost:8000", region_name="eu-west-2"
+# )
 
 
 def main():
-    db = dynamodb_web_service
-    _users = db.Table("users")
-    users = _users.scan()["Items"]
-
-    for user in users:
-        matched_jobs = []
-        try:
+    try:
+        db = dynamodb_web_service
+        _users = db.Table("users")
+        users = _users.scan()["Items"]
+        for user in users:
+            matched_jobs = []
             relevant_jobs_found = get_relevant_jobs(db, user)
             matched_jobs.extend(relevant_jobs_found)
             jobs_posted_by_orgs_followed = get_jobs_from_followed_orgs(db, user)
@@ -52,8 +53,8 @@ def main():
                 sender_password,
             )
             save_sent_alerts(db, user, matched_jobs)
-        except Exception as e:
-            print(e)
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":

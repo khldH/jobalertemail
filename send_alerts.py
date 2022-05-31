@@ -48,14 +48,14 @@ def get_jobs_from_followed_orgs(db_con, user):
                         "category": job["category"],
                     }
                     if _job["source"] == "Somali jobs":
-                        if _job.posted_date == "Today":
+                        if _job['posted_date'] == "Today":
                             _job["days_since_posted"] = 0
-                        elif _job.posted_date == "Yesterday":
+                        elif _job['posted_date'] == "Yesterday":
                             _job["days_since_posted"] = 1
                         else:
                             _job["days_since_posted"] = (
                                 datetime.now().date()
-                                - parser.parse(_job.posted_date).date()
+                                - parser.parse(_job['posted_date']).date()
                             ).days
 
                     else:
