@@ -15,14 +15,20 @@ def get_relevant_jobs(db_con, user):
     table = db_con.Table("jobs")
     jobs = table.scan()["Items"]
     documents = []
+    relevant_jobs = []
     for job in jobs:
         documents.append(Document(**job))
     if user["is_active"] and user["job_description"] is not None:
         try:
             document_search = DocumentSearch(documents)
+            if len(user["job_description"].split(",")) > 1:
+                for item in user["job_description"].split(","):
+                    if len(item.strip()) >= 3:
+                        relevant_jobs.extend(document_search.search(item.strip()))
+                return relevant_jobs
             query = re.sub("[^A-Za-z0-9]+", " ", user["job_description"])
             if len(query) > 1:
-                relevant_jobs = document_search.search(query)
+                relevant_jobs.extend(document_search.search(query))
                 return relevant_jobs
         except Exception as e:
             print(e)
@@ -48,14 +54,14 @@ def get_jobs_from_followed_orgs(db_con, user):
                         "category": job["category"],
                     }
                     if _job["source"] == "Somali jobs":
-                        if _job['posted_date'] == "Today":
+                        if _job["posted_date"] == "Today":
                             _job["days_since_posted"] = 0
-                        elif _job['posted_date'] == "Yesterday":
+                        elif _job["posted_date"] == "Yesterday":
                             _job["days_since_posted"] = 1
                         else:
                             _job["days_since_posted"] = (
                                 datetime.now().date()
-                                - parser.parse(_job['posted_date']).date()
+                                - parser.parse(_job["posted_date"]).date()
                             ).days
 
                     else:
@@ -137,14 +143,18 @@ def send_daily_job_alerts(
                     # saved_alert=user["job_description"],
                 )
                 email_title = (
-                    first_job_title
-                    + " "
-                    + "and"
-                    + " "
-                    + str(count_new_jobs - 1)
-                    + " "
-                    + "other new job(s) have been found for you "
+                    "1 new " + first_job_title + " " + "job has been found for you"
                 )
+                if count_new_jobs > 1:
+                    email_title = (
+                        first_job_title
+                        + " "
+                        + "and"
+                        + " "
+                        + str(count_new_jobs - 1)
+                        + " "
+                        + "other new job(s) have been found for you "
+                    )
                 email = Email(sender_email, sender_password)
                 email.send_message(content, email_title, user["email"])
             except Exception as e:
