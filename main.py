@@ -34,7 +34,7 @@ def main():
         users = db.Table("users").scan()["Items"]
         jobs_posted_recently = get_new_jobs_posted_recently(db_con=db)
         for user in users:
-            if user["is_active"] and user["is_all"]:
+            if user["is_active"] and user.get("is_all", None):
                 send_daily_job_alerts(
                     db,
                     user,
@@ -55,6 +55,7 @@ def main():
                     dict(job)
                     for job in set(tuple(sorted(j.items())) for j in matched_jobs)
                 ]
+                print(unique_matched_jobs)
                 send_daily_job_alerts(
                     db,
                     user,
