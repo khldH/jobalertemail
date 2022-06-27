@@ -30,7 +30,7 @@ local_db = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
 
 def main():
     try:
-        db = local_db
+        db = dynamodb_web_service
         users = db.Table("users").scan()["Items"]
         jobs_posted_recently = get_new_jobs_posted_recently(db_con=db)
         for user in users:
