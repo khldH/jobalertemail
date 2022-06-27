@@ -11,9 +11,32 @@ from document_search import Document, DocumentSearch
 from emailing import Email
 
 
+def get_new_jobs_posted_recently(db_con):
+    jobs = db_con.Table("jobs").scan()["Items"]
+    jobs_posted_recently = []
+    for job in jobs:
+        if job["source"] == "Somali jobs":
+            if job["posted_date"] == "Today":
+                job["days_since_posted"] = 0
+            elif job["posted_date"] == "Yesterday":
+                job["days_since_posted"] = 1
+            else:
+                job["days_since_posted"] = (
+                    datetime.now().date() - parser.parse(job["posted_date"]).date()
+                ).days
+
+        else:
+            job["days_since_posted"] = (
+                datetime.now().date()
+                - datetime.fromisoformat(job["posted_date"]).date()
+            ).days
+        if job["days_since_posted"] <= 3:
+            jobs_posted_recently.append(job)
+    return jobs_posted_recently
+
+
 def get_relevant_jobs(db_con, user):
-    table = db_con.Table("jobs")
-    jobs = table.scan()["Items"]
+    jobs = db_con.Table("jobs").scan()["Items"]
     documents = []
     relevant_jobs = []
     for job in jobs:
@@ -32,12 +55,11 @@ def get_relevant_jobs(db_con, user):
                 return relevant_jobs
         except Exception as e:
             print(e)
-    return []
+    return relevant_jobs
 
 
 def get_jobs_from_followed_orgs(db_con, user):
-    table = db_con.Table("jobs")
-    jobs = table.scan()["Items"]
+    jobs = db_con.Table("jobs").scan()["Items"]
     jobs_posted_by_orgs_followed = []
     if user["is_active"] and user.get("follows", None):
         for org in user["follows"]:
