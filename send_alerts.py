@@ -11,8 +11,7 @@ from document_search import Document, DocumentSearch
 from emailing import Email
 
 
-def get_new_jobs_posted_recently(db_con):
-    jobs = db_con.Table("jobs").scan()["Items"]
+def get_new_jobs_posted_recently(jobs):
     jobs_posted_recently = []
     for job in jobs:
         if job["source"] == "Somali jobs":
@@ -35,8 +34,7 @@ def get_new_jobs_posted_recently(db_con):
     return jobs_posted_recently
 
 
-def get_relevant_jobs(db_con, user):
-    jobs = db_con.Table("jobs").scan()["Items"]
+def get_relevant_jobs(jobs, user):
     documents = []
     relevant_jobs = []
     for job in jobs:
@@ -58,8 +56,7 @@ def get_relevant_jobs(db_con, user):
     return relevant_jobs
 
 
-def get_jobs_from_followed_orgs(db_con, user):
-    jobs = db_con.Table("jobs").scan()["Items"]
+def get_jobs_from_followed_orgs(jobs, user):
     jobs_posted_by_orgs_followed = []
     if user["is_active"] and user.get("follows", None):
         for org in user["follows"]:
@@ -100,7 +97,7 @@ def get_jobs_from_followed_orgs(db_con, user):
 
 
 def send_daily_job_alerts(
-    db_con,
+    sent_job_alerts,
     user,
     matched_jobs,
     email_template,
@@ -108,14 +105,11 @@ def send_daily_job_alerts(
     sender_email,
     sender_password,
 ):
-    table_sent_job_alerts = db_con.Table("sent_job_alerts")
-    alerts = table_sent_job_alerts.scan(
-        FilterExpression=Attr("user_id").eq(user["id"])
-    )["Items"]
-    sent_job_urls = []
-    if len(alerts):
-        for alert in alerts:
-            sent_job_urls.append(alert["job_url"])
+    sent_job_urls = [] = []
+    for job_alert in sent_job_alerts:
+        if job_alert["user_id"] == user["id"]:
+            sent_job_urls.append(job_alert["job_url"])
+
     user_relevant_jobs = matched_jobs
     if len(user_relevant_jobs) > 0:
         rows = ""
@@ -187,11 +181,10 @@ def send_daily_job_alerts(
         print("no new matches found")
 
 
-def save_sent_alerts(db_con, user, alerts):
-    aws_db_table_sent_job_alerts = db_con.Table("sent_job_alerts")
+def save_sent_alerts(sent_job_alerts, user, alerts):
     try:
         for item in alerts:
-            aws_db_table_sent_job_alerts.put_item(
+            sent_job_alerts.put_item(
                 Item={
                     "user_id": user["id"],
                     "job_id": item["id"],

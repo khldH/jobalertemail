@@ -32,11 +32,14 @@ def main():
     try:
         db = dynamodb_web_service
         users = db.Table("users").scan()["Items"]
-        jobs_posted_recently = get_new_jobs_posted_recently(db_con=db)
+        jobs = db.Table("jobs").scan()["Items"]
+        sent_job_alerts_table = db.Table("sent_job_alerts")
+        sent_job_alerts = sent_job_alerts_table.scan()["Items"]
+        jobs_posted_recently = get_new_jobs_posted_recently(jobs)
         for user in users:
             if user["is_active"] and user.get("is_all", None):
                 send_daily_job_alerts(
-                    db,
+                    sent_job_alerts,
                     user,
                     jobs_posted_recently,
                     html_email,
@@ -44,20 +47,20 @@ def main():
                     sender_email,
                     sender_password,
                 )
-                save_sent_alerts(db, user, jobs_posted_recently)
+                save_sent_alerts(sent_job_alerts_table, user, jobs_posted_recently)
             else:
                 matched_jobs = []
-                relevant_jobs_found = get_relevant_jobs(db, user)
+                relevant_jobs_found = get_relevant_jobs(jobs_posted_recently, user)
                 matched_jobs.extend(relevant_jobs_found)
-                jobs_posted_by_orgs_followed = get_jobs_from_followed_orgs(db, user)
+                jobs_posted_by_orgs_followed = get_jobs_from_followed_orgs(jobs_posted_recently, user)
                 matched_jobs.extend(jobs_posted_by_orgs_followed)
                 unique_matched_jobs = [
                     dict(job)
                     for job in set(tuple(sorted(j.items())) for j in matched_jobs)
                 ]
-                print(unique_matched_jobs)
+                # print(unique_matched_jobs)
                 send_daily_job_alerts(
-                    db,
+                    sent_job_alerts,
                     user,
                     unique_matched_jobs,
                     html_email,
@@ -65,7 +68,7 @@ def main():
                     sender_email,
                     sender_password,
                 )
-                save_sent_alerts(db, user, matched_jobs)
+                save_sent_alerts(sent_job_alerts_table, user, matched_jobs)
     except Exception as e:
         print(e)
 
