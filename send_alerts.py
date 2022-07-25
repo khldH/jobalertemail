@@ -105,11 +105,11 @@ def send_daily_job_alerts(
     sender_email,
     sender_password,
 ):
-    sent_job_urls = [] = []
+    sent_job_urls = []
     for job_alert in sent_job_alerts:
         if job_alert["user_id"] == user["id"]:
             sent_job_urls.append(job_alert["job_url"])
-
+    # print(sent_job_urls)
     user_relevant_jobs = matched_jobs
     if len(user_relevant_jobs) > 0:
         rows = ""
@@ -159,7 +159,7 @@ def send_daily_job_alerts(
                     # saved_alert=user["job_description"],
                 )
                 email_title = (
-                    "1 new " + first_job_title + " " + "job has been found for you"
+                    first_job_title + " " + "job has been found for you"
                 )
                 if count_new_jobs > 1:
                     email_title = (
