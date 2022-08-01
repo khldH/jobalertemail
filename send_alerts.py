@@ -29,7 +29,7 @@ def get_new_jobs_posted_recently(jobs):
                 datetime.now().date()
                 - datetime.fromisoformat(job["posted_date"]).date()
             ).days
-        if job["days_since_posted"] <= 3:
+        if job["days_since_posted"] == 1:
             jobs_posted_recently.append(job)
     return jobs_posted_recently
 
