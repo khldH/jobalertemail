@@ -31,7 +31,7 @@ dynamodb_web_service = boto3.resource(
 
 
 def main():
-    try:
+    # try:
         db = dynamodb_web_service
         users = db.Table("users").scan()["Items"]
         jobs = db.Table("jobs").scan()["Items"]
@@ -70,8 +70,8 @@ def main():
                     sender_password,
                 )
                 save_sent_alerts(sent_job_alerts_table, user, matched_jobs)
-    except Exception as e:
-        print(e)
+    # except Exception as e:
+    #     print(e)
 
 
 if __name__ == "__main__":

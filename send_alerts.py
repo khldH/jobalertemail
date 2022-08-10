@@ -62,36 +62,29 @@ def get_jobs_from_followed_orgs(jobs, user):
         for org in user["follows"]:
             for job in jobs:
                 if job["organization"] == org:
-                    _job = {
-                        "id": job["id"],
-                        "title": job["title"],
-                        "url": job["url"],
-                        "source": job["source"],
-                        "organization": job["organization"],
-                        "posted_date": job["posted_date"],
-                        "type": job["type"],
-                        "category": job["category"],
-                    }
-                    if _job["source"] == "Somali jobs":
-                        if _job["posted_date"] == "Today":
-                            _job["days_since_posted"] = 0
-                        elif _job["posted_date"] == "Yesterday":
-                            _job["days_since_posted"] = 1
-                        else:
-                            _job["days_since_posted"] = (
-                                datetime.now().date()
-                                - parser.parse(_job["posted_date"]).date()
-                            ).days
-
-                    else:
-                        _job["days_since_posted"] = (
-                            datetime.now().date()
-                            - datetime.fromisoformat(_job["posted_date"]).date()
-                        ).days
-                    if _job["days_since_posted"] <= 3 and _job[
-                        "category"
-                    ].strip() not in ["Tender/Bid/RFQ/RFP", "Course", ""]:
-                        jobs_posted_by_orgs_followed.append(_job)
+                    _job = {"id": job["id"], "title": job["title"], "url": job["url"], "source": job["source"],
+                            "organization": job["organization"], "posted_date": job["posted_date"], "type": job["type"],
+                            "category": job["category"], "days_since_posted": 1}
+                    # if _job["source"] == "Somalijobs":
+                    #     if _job["posted_date"] == "Today":
+                    #         _job["days_since_posted"] = 0
+                    #     elif _job["posted_date"] == "Yesterday":
+                    #         _job["days_since_posted"] = 1
+                    #     else:
+                    #         _job["days_since_posted"] = (
+                    #             datetime.now().date()
+                    #             - parser.parse(_job["posted_date"]).date()
+                    #         ).days
+                    #
+                    # else:
+                    #     _job["days_since_posted"] = (
+                    #         datetime.now().date()
+                    #         - datetime.fromisoformat(_job["posted_date"]).date()
+                    #     ).days
+                    # if _job["days_since_posted"] <= 3 and _job[
+                    #     "category"
+                    # ].strip() not in ["Tender/Bid/RFQ/RFP", "Course", ""]:
+                    jobs_posted_by_orgs_followed.append(_job)
         return jobs_posted_by_orgs_followed
     return []
 
