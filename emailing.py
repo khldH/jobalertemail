@@ -26,3 +26,12 @@ class Email:
             print("email sent successfully")
         except Exception as e:
             print(e)
+
+    def send_resource(self, resource: str, mail_to: str):
+        message = """<html> <head></head> <body> <p>Dear subscriber;<br><br> Thank you for using Diraclty. Please 
+        tell us about your experience in this 30 seconds survey.<br> Your feedback will help us create a better 
+        experience for you and other subscribers<br><br> <a href="{link}">{text}</a> <br><br>
+        - Your friends at Diraclty </p> </body> </html>""".format(
+            link=resource, text="Get Started"
+        )
+        self.send_message(message, "Tell us what you think of Diractly in 30 seconds", mail_to)

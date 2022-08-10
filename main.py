@@ -2,6 +2,8 @@ import os
 
 import boto3
 from dotenv import load_dotenv
+from emailing import Email
+import time
 
 from email_template import html_email
 from send_alerts import (
@@ -58,7 +60,6 @@ def main():
                     dict(job)
                     for job in set(tuple(sorted(j.items())) for j in matched_jobs)
                 ]
-                # print(unique_matched_jobs)
                 send_daily_job_alerts(
                     sent_job_alerts,
                     user,
@@ -75,3 +76,17 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    # db = dynamodb_web_service
+    # users = db.Table("users").scan()["Items"]
+    # email = Email(sender_email, sender_password)
+    # try:
+    #     for user in users:
+    #         if user["is_active"]:
+    #             print(user['email'])
+    #             email.send_resource("https://0k17bqutzny.typeform.com/to/S2YzWaMx",  user['email'])
+    #             time.sleep(5)
+    # except Exception as e:
+    #     print(e)
+
+
