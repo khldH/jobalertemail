@@ -14,7 +14,7 @@ from emailing import Email
 def get_new_jobs_posted_recently(jobs):
     jobs_posted_recently = []
     for job in jobs:
-        if job["source"] == "Somali jobs":
+        if job["source"] == "Somalijobs":
             if job["posted_date"] == "Today":
                 job["days_since_posted"] = 0
             elif job["posted_date"] == "Yesterday":
