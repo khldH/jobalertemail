@@ -24,6 +24,11 @@ def get_new_jobs_posted_recently(jobs):
                     datetime.now().date() - parser.parse(job["posted_date"]).date()
                 ).days
 
+        elif job["source"] == "weworkremotely":
+            job["days_since_posted"] = (
+                    datetime.now().date() - parser.parse(job['posted_date']).date()
+            ).days
+
         else:
             job["days_since_posted"] = (
                 datetime.now().date()

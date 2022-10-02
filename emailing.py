@@ -34,4 +34,13 @@ class Email:
         - Your friends at Diraclty </p> </body> </html>""".format(
             link=resource, text="Get Started"
         )
-        self.send_message(message, "Tell us what you think of Diractly in 30 seconds", mail_to)
+
+        message = """<html> <head></head> <body> <p>Dear subscriber;<br><br> Thank you for using Diraclty<br>
+        
+        Get a free CV template hand picked by an expert recruiter when you complete your profile
+         <br><br> <a href="{link}">{text}</a> <br><br> - Your friends at Diraclty 
+        </p> </body> </html>""".format(
+            link=resource, text="Complete your profile in under 1 minute"
+        )
+        self.send_message(message, "Get a free CV template hand picked by an expert recruiter after you update your "
+                                   "profile. It takes less than 1 minute to complete your profile ", mail_to)
